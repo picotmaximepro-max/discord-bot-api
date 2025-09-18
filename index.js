@@ -1,64 +1,39 @@
-import express from "express";
-import { Client, GatewayIntentBits } from "discord.js";
+// index.js
+const express = require('express');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ⚠️ Mets ton token de bot dans les variables d'environnement
-const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
-const GUILD_ID = "1371867243977117736"; // Ton serveur
+// Active CORS pour toutes les origines
+app.use(cors());
 
-// Initialisation du bot Discord
-const client = new Client({
-  intents: [GatewayIntentBits.Guilds]
+// (Optionnel) Si tu veux limiter à ton site uniquement :
+// app.use(cors({ origin: 'https://ton-site.com' }));
+
+app.use(express.json());
+
+// Route qui renvoie les stats du serveur
+app.get('/stats', (req, res) => {
+  // Ici tu mettras ton vrai code qui récupère les infos de Discord
+  res.json({
+    id: "1371867243977117736",
+    name: "ᵐᵃʳˣˢʸˡˡ",
+    approximate_member_count: 14,
+    approximate_presence_count: 10
+  });
 });
 
-// Quand le bot est prêt
-client.once("ready", () => {
-  console.log(`✅ Connecté en tant que ${client.user.tag}`);
+// Route qui renvoie la liste des salons (exemple vide)
+app.get('/channels', (req, res) => {
+  // Ici tu mettras ton vrai code pour lister les salons
+  res.json([]);
 });
 
-// Endpoint API pour récupérer les salons
-app.get("/channels", async (req, res) => {
-  try {
-    const guild = await client.guilds.fetch(GUILD_ID);
-    const channels = await guild.channels.fetch();
+// Pour gérer les requêtes OPTIONS (préflight CORS)
+app.options('*', cors());
 
-    const formatted = channels.map(ch => ({
-      id: ch.id,
-      name: ch.name,
-      type: ch.type
-    }));
-
-    res.json(formatted);
-  } catch (error) {
-    console.error("Erreur API /channels:", error);
-    res.status(500).json({ error: "Impossible de récupérer les salons." });
-  }
-});
-
-// Endpoint API pour récupérer les infos du serveur (ex: membres)
-app.get("/stats", async (req, res) => {
-  try {
-    const guild = await client.guilds.fetch(GUILD_ID);
-    const fetched = await guild.fetch();
-
-    res.json({
-      id: guild.id,
-      name: guild.name,
-      approximate_member_count: fetched.approximateMemberCount,
-      approximate_presence_count: fetched.approximatePresenceCount
-    });
-  } catch (error) {
-    console.error("Erreur API /stats:", error);
-    res.status(500).json({ error: "Impossible de récupérer les stats." });
-  }
-});
-
-// Lancer le serveur web
+// Lancement du serveur
 app.listen(PORT, () => {
-  console.log(`🌍 API disponible sur http://localhost:${PORT}`);
+  console.log(`✅ API Discord bot lancée sur le port ${PORT}`);
 });
-
-// Lancer le bot
-client.login(DISCORD_TOKEN);
