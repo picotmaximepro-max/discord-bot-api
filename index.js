@@ -1,11 +1,11 @@
-import express from 'express';
-import { Client, GatewayIntentBits } from 'discord.js';
-import cors from 'cors';
+const express = require('express');
+const { Client, GatewayIntentBits } = require('discord.js');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// CORS activé pour toutes les origines
+// Active CORS pour toutes les origines
 app.use(cors());
 
 // Créer le client Discord
