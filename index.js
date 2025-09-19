@@ -1,39 +1,30 @@
-// index.js
-const express = require('express');
-const cors = require('cors');
+import { Client, GatewayIntentBits } from 'discord.js';
+import express from 'express';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Active CORS pour toutes les origines
-app.use(cors());
-
-// (Optionnel) Si tu veux limiter à ton site uniquement :
-// app.use(cors({ origin: 'https://ton-site.com' }));
-
-app.use(express.json());
-
-// Route qui renvoie les stats du serveur
-app.get('/stats', (req, res) => {
-  // Ici tu mettras ton vrai code qui récupère les infos de Discord
-  res.json({
-    id: "1371867243977117736",
-    name: "ᵐᵃʳˣˢʸˡˡ",
-    approximate_member_count: 14,
-    approximate_presence_count: 10
-  });
+const client = new Client({
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildVoiceStates]
 });
 
-// Route qui renvoie la liste des salons (exemple vide)
-app.get('/channels', (req, res) => {
-  // Ici tu mettras ton vrai code pour lister les salons
-  res.json([]);
+client.once('ready', () => {
+    console.log(`Connecté en tant que ${client.user.tag}`);
 });
 
-// Pour gérer les requêtes OPTIONS (préflight CORS)
-app.options('*', cors());
+app.get('/channels', async (req, res) => {
+    const guild = await client.guilds.fetch('1371867243977117736'); // L'ID de ton serveur
 
-// Lancement du serveur
-app.listen(PORT, () => {
-  console.log(`✅ API Discord bot lancée sur le port ${PORT}`);
+    try {
+        const channels = await guild.channels.fetch();
+        const formatted = channels.map(ch => ({
+            id: ch.id,
+            name: ch.name,
+            type: ch.type
+        }));
+        res.json(formatted); // Retourne la liste des salons
+    } catch (err) {
+        res.status(500).send("Erreur lors de la récupération des salons.");
+    }
 });
+
+client.login('TON_TOKEN');
+app.listen(3000, () => console.log('API en ligne.'));
