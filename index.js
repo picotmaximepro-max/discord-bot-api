@@ -1,6 +1,6 @@
-const express = require('express');
-const { Client, GatewayIntentBits } = require('discord.js');
-const cors = require('cors');
+import express from 'express';
+import { Client, GatewayIntentBits } from 'discord.js';
+import cors from 'cors';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
